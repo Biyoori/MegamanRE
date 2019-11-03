@@ -20,6 +20,7 @@ public class PlayerController : MonoBehaviour{
     public float jumpPower = 4f;
     public float fallMultiplier = 2.5f;
     public float lowJumpMultiplier = 2f;
+    public float health = 5f;
 
 
     // Start is called before the first frame update
@@ -44,6 +45,7 @@ public class PlayerController : MonoBehaviour{
         Move();
         Jump();
         Attack();
+        Die();
     }
 
     void Move()
@@ -138,5 +140,17 @@ public class PlayerController : MonoBehaviour{
     void StopAttack()
     {
         isAttack = false;
+    }
+
+    public void TakeDamage(float damage)
+    {
+        health -= damage;
+        Debug.Log("Damage Taken: " + damage);
+    }
+
+    public void Die()
+    {
+        if (health <= 0)
+            Destroy(gameObject);
     }
 }
