@@ -92,7 +92,7 @@ public class Shotman : EnemyUnit
             GameObject bullet = (GameObject)Instantiate(bulletRef);
             bullet.AddComponent<ShotmanBulletScript>();
             bullet.transform.position = new Vector3(transform.position.x - 0.15f, transform.position.y, -2f);
-            bullet.GetComponent<ShotmanBulletScript>().direction = new Vector2(Random.Range(-0.5f, -1f), Random.Range(4, 4.5f));
+            bullet.GetComponent<ShotmanBulletScript>().direction = new Vector2(Random.Range(-0.5f, -1f), Random.Range(3.4f, 3.9f));
             isCooldown = true;
         }
         else

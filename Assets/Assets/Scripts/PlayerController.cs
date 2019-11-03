@@ -12,6 +12,12 @@ public class PlayerController : MonoBehaviour{
     [SerializeField]
     Transform groundCheck;
 
+    [SerializeField]
+    Transform groundCheckL;
+
+    [SerializeField]
+    Transform groundCheckR;
+
     bool isGrounded = false;
     bool isAttack = false;
     bool shotLeft = false;
@@ -102,7 +108,7 @@ public class PlayerController : MonoBehaviour{
 
     void GroundCheck()
     {
-        if (Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground")))
+        if (Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground")) || Physics2D.Linecast(transform.position, groundCheckL.position, 1 << LayerMask.NameToLayer("Ground")) || Physics2D.Linecast(transform.position, groundCheckR.position, 1 << LayerMask.NameToLayer("Ground")))
         {
             isGrounded = true;
         }

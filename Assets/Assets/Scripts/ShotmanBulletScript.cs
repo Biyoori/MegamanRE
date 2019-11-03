@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class ShotmanBulletScript : MonoBehaviour
+public class ShotmanBulletScript : EnemyBullet
 {
     Rigidbody2D rb2d;
     PlayerController playerCon;
@@ -22,13 +22,15 @@ public class ShotmanBulletScript : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        Invoke("SelfDestroy", 3f);
     }
 
     private void OnTriggerEnter2D(Collider2D collision)
     {
         if (collision.gameObject.CompareTag("Megaman"))
+        {
             collision.gameObject.GetComponent<PlayerController>().TakeDamage(bulletDamage);
+            Destroy(gameObject);
+        }
     }
-
 }
