@@ -7,11 +7,14 @@ public class PlayerController : MonoBehaviour{
     Rigidbody2D rb2d;
     SpriteRenderer spriteRenderer;
     Transform move;
+    Object bulletRef;
 
     [SerializeField]
     Transform groundCheck;
 
     bool isGrounded = false;
+    bool isAttack = false;
+    bool shotLeft = false;
 
     public float moveSpeed = 5f;
     public float jumpPower = 4f;
@@ -26,6 +29,7 @@ public class PlayerController : MonoBehaviour{
         rb2d = GetComponent<Rigidbody2D>();
         spriteRenderer = GetComponent<SpriteRenderer>();
         move = GetComponent<Transform>();
+        bulletRef = Resources.Load("Bullet");
     }
 
     // Update is called once per frame
@@ -36,35 +40,46 @@ public class PlayerController : MonoBehaviour{
 
     private void FixedUpdate()
     {
-        if (Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground")))
-        {
-            isGrounded = true;
-        }
-        else
-            isGrounded = false;
+        GroundCheck();
         Move();
         Jump();
-        
+        Attack();
     }
 
     void Move()
     {
         float translate = Input.GetAxis("Horizontal") * moveSpeed * Time.fixedDeltaTime;
         move.Translate(translate, 0, 0);
-        Debug.Log("Move: " + move);
-        Debug.Log("Translate " + translate);
         if (translate < 0 && isGrounded)
         {
-            animator.Play("Mega_Run");
-            spriteRenderer.flipX = true;
+            shotLeft = false;
+            if (isAttack)
+            {
+                animator.Play("Mega_RunAttack");
+                spriteRenderer.flipX = true;
+            }
+            else
+            {
+                animator.Play("Mega_Run");
+                spriteRenderer.flipX = true;
+            }
         }
         else if (translate > 0 && isGrounded)
         {
-            animator.Play("Mega_Run");
-            spriteRenderer.flipX = false;
+            shotLeft = true;
+            if (isAttack)
+            {
+                animator.Play("Mega_RunAttack");
+                spriteRenderer.flipX = false;
+            }
+            else
+            {
+                animator.Play("Mega_Run");
+                spriteRenderer.flipX = false;
+            }
         }
         else
-            if (isGrounded)
+            if (isGrounded && !isAttack)
             animator.Play("Mega_Idle");
     }
 
@@ -81,5 +96,47 @@ public class PlayerController : MonoBehaviour{
             rb2d.velocity += Vector2.up * Physics2D.gravity.y * (fallMultiplier - 1) * Time.deltaTime;
         else if (rb2d.velocity.y > 0 && !Input.GetKey(KeyCode.Space))
             rb2d.velocity += Vector2.up * Physics2D.gravity.y * (lowJumpMultiplier - 1) * Time.deltaTime;
+    }
+
+    void GroundCheck()
+    {
+        if (Physics2D.Linecast(transform.position, groundCheck.position, 1 << LayerMask.NameToLayer("Ground")))
+        {
+            isGrounded = true;
+        }
+        else
+            isGrounded = false;
+    }
+
+    void Attack()
+    {
+        if (Input.GetKeyDown(KeyCode.K) && !isAttack)
+        {
+            isAttack = true;
+            GameObject bullet = (GameObject)Instantiate(bulletRef);
+            if (shotLeft)
+            {
+                bullet.transform.position = new Vector3(transform.position.x + 0.2f, transform.position.y, -1);
+                bullet.GetComponent<BulletScript>().direction = new Vector2(3, 0);
+            }
+
+            else
+            {
+                bullet.transform.position = new Vector3(transform.position.x - 0.2f, transform.position.y, -1);
+                bullet.GetComponent<BulletScript>().direction = new Vector2(-3, 0);
+            }
+                
+
+        }
+        if (isAttack)
+        {
+            animator.Play("Mega_Attack");
+            Invoke("StopAttack", 0.2f);
+        }
+    }
+
+    void StopAttack()
+    {
+        isAttack = false;
     }
 }
